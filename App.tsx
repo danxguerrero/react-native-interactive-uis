@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Modal } from 'react-native';
 
 import { SearchBar } from './components/SearchBar';
 import { FilterSwitch } from './components/FilterSwitch';
@@ -9,7 +9,7 @@ import { products } from './data/product';
 import { Product } from './types';
 import { CartSummary } from './components/CartSummary';
 
-export default function App(){
+export default function App() {
   const [searchText, setSearchText] = useState<string>('');
   const [showOnlySale, setShowOnlySale] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<number | null>(null);
@@ -43,15 +43,20 @@ export default function App(){
 
   return (
     <View style={styles.container}>
-      {/* todo: MODAL wrap in modal*/}
-      <>
-        {/* <View style={styles.modalContainer}>
-          <View style={styles.summaryContainer}>
-            <View style={styles.summary}>
+      {showCartSummary && (
+        <Modal
+          animationType='slide'
+          transparent
+          onRequestClose={() => setShowCartSummary(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.summaryContainer}>
+              <View style={styles.summary}>
+              <CartSummary items={addedItems} onClear={console.log} onClose={console.log} />
+              </View>
             </View>
           </View>
-        </View> */}
-      </>
+        </Modal>)}
       <View style={styles.header}>
         <Text style={styles.headerText}>Codecademy Store</Text>
       </View>
@@ -68,19 +73,29 @@ export default function App(){
         />
 
         {/* todo: PRESSABLE view cart */}
-
+        <Pressable
+          style={[styles.summaryButton, addedItems.length === 0 ? styles.disabled : ""]}
+          disabled={!addedItems}
+          onPress={() => setShowCartSummary(true)}
+          hitSlop={{
+            top: 5,
+            bottom: 5
+          }}
+        >
+          <Text style={styles.buttonText}>View Cart</Text>
+        </Pressable>
 
         {/* todo: FLATLIST create flatlist */}
-        <FlatList 
+        <FlatList
           data={filteredProducts}
-          renderItem={({item}) => <ProductCard
-          product={item}
-          isLoading={isLoading === item.id}
-          isAdded={addedItemsSet.has(item.id)}
-          onAddToCart={handleAddToCart}
-        />
-        }
-        keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <ProductCard
+            product={item}
+            isLoading={isLoading === item.id}
+            isAdded={addedItemsSet.has(item.id)}
+            onAddToCart={handleAddToCart}
+          />
+          }
+          keyExtractor={(item) => item.id.toString()}
         />
       </View>
     </View>
@@ -131,13 +146,15 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     // todo: MODAL center
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   summaryContainer: {
-    height: "70%", 
+    height: "70%",
     backgroundColor: "#A8D4FF",
     borderWidth: 1,
-    borderRadius: 20 
+    borderRadius: 20
   },
   summary: {
     flex: 1,
