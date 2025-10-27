@@ -6,6 +6,13 @@ export function SearchBar({ searchText, setSearchText }: SearchBarProps) {
   return (
     <View style={styles.searchBox}>
       {/* todo: INPUT add textInput*/}
+      <TextInput
+        placeholder='Search products...'
+        style={styles.textInput}
+        value={searchText}
+        onChangeText={setSearchText}
+        accessibilityLabel='Search products filter'
+      />
     </View>
   )
 }
