@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { View, Text, StyleSheet, FlatList, Pressable, Modal } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Modal, Alert, Platform } from 'react-native';
 
 import { SearchBar } from './components/SearchBar';
 import { FilterSwitch } from './components/FilterSwitch';
@@ -38,7 +38,33 @@ export default function App() {
 
   function onClearCartHandler() {
     // todo: "Alert" confirm clearing
+    if (Platform.OS === 'web') {
+      const confirmed = confirm("Are you sure you want to empty your cart? You won't be able to undo this.");
+      if (confirmed) {
+        setAddedItems([]);
+        setShowCartSummary(false);
+      }
+      return;
+    }
 
+    Alert.alert(
+      "Empty Cart", 
+      "Are you sure you want to empty your cart? You won't be able to undo this.", 
+      [
+        {
+          text: 'Empty',
+          onPress: () => {
+            setAddedItems([]);
+            setShowCartSummary(false);
+          }
+        },
+        {
+          text: 'Cancel',
+          onPress: () => setShowCartSummary(false)
+        }
+      ]
+    )
+    
   }
 
   return (
@@ -52,7 +78,7 @@ export default function App() {
           <View style={styles.modalContainer}>
             <View style={styles.summaryContainer}>
               <View style={styles.summary}>
-              <CartSummary items={addedItems} onClear={console.log} onClose={console.log} />
+              <CartSummary items={addedItems} onClear={onClearCartHandler} onClose={() => setShowCartSummary(false)}/>
               </View>
             </View>
           </View>
